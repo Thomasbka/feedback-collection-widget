@@ -1,83 +1,75 @@
 import React, { useState } from 'react';
 
 function CustomizationPanel({ questions, setQuestions }) {
-  const [newQuestion, setNewQuestion] = useState({
-    label: '',
-    type: 'text',
-    required: false
-  });
-
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setNewQuestion({
-      ...newQuestion,
-      [name]: type === 'checkbox' ? checked : value
-    });
-  };
+  const [questionLabel, setQuestionLabel] = useState('');
+  const [questionType, setQuestionType] = useState('text');
+  const [required, setRequired] = useState(false);
 
   const addQuestion = () => {
-    setQuestions([...questions, { ...newQuestion, id: Date.now() }]);
-    setNewQuestion({ label: '', type: 'text', required: false });
+    setQuestions([
+      ...questions,
+      { id: Date.now(), label: questionLabel, type: questionType, required }
+    ]);
+    setQuestionLabel('');
+    setQuestionType('text');
+    setRequired(false);
   };
 
+  // Delete question function
   const deleteQuestion = (id) => {
     setQuestions(questions.filter((question) => question.id !== id));
   };
 
   return (
-    <section className="p-3 border rounded bg-light">
+    <div className="p-3 border rounded bg-light">
       <h2>Customize Feedback Form</h2>
-      <div className="mb-3">
-        <label className="form-label">Question Label</label>
+      <div className="form-element">
         <input
           type="text"
+          value={questionLabel}
+          onChange={(e) => setQuestionLabel(e.target.value)}
+          placeholder="Question Label"
           className="form-control"
-          name="label"
-          value={newQuestion.label}
-          onChange={handleInputChange}
         />
-
-        <label className="form-label mt-2">Question Type</label>
+      </div>
+      <div className="form-element">
         <select
-          className="form-select"
-          name="type"
-          value={newQuestion.type}
-          onChange={handleInputChange}
+          value={questionType}
+          onChange={(e) => setQuestionType(e.target.value)}
+          className="form-control"
         >
           <option value="text">Text</option>
           <option value="textarea">Textarea</option>
           <option value="rating">Rating</option>
-          <option value="checkbox">Checkbox</option>
         </select>
-
-        <div className="form-check mt-2">
-          <input
-            className="form-check-input"
-            type="checkbox"
-            name="required"
-            checked={newQuestion.required}
-            onChange={handleInputChange}
-          />
-          <label className="form-check-label">Required</label>
-        </div>
-
-        <button className="btn btn-primary mt-3" onClick={addQuestion}>
-          Add Question
-        </button>
       </div>
-
+      <div className="form-element">
+        <label>
+          <input
+            type="checkbox"
+            checked={required}
+            onChange={(e) => setRequired(e.target.checked)}
+          />
+          Required
+        </label>
+      </div>
+      <button onClick={addQuestion} className="btn btn-primary">Add Question</button>
+      
       <h3>Questions</h3>
-      <ul className="list-group mt-2">
-        {questions.map((question) => (
-          <li key={question.id} className="list-group-item d-flex justify-content-between align-items-center">
-            <span>{question.label} ({question.type})</span>
-            <button className="btn btn-danger btn-sm" onClick={() => deleteQuestion(question.id)}>
+      <ul>
+        {questions.map((q) => (
+          <li key={q.id}>
+            {q.label} ({q.type}) {q.required && '(Required)'}
+            <button
+              className="btn btn-danger btn-sm ms-2"
+              onClick={() => deleteQuestion(q.id)}
+            >
               Delete
             </button>
           </li>
         ))}
       </ul>
-    </section>
+    </div>
   );
 }
 
